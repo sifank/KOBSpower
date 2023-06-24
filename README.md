@@ -1,24 +1,22 @@
-# DLI Digiswitch
-INDI DLI switch driver
+# KOBS Power
+INDI Kahale Observatory RPI driver for relays and PWM dew control
 
-DLI Digiswitch INDI Driver
+KOBS Power INDI Driver
 =========================================
 This package provides the INDI driver for DLI's Digiswitch (Web Switch Pro):
-- Rugged, reliable power control over the web. Industrial quality, 15A
-- Secure web server with SSL, SSH, HTTPS, SNMP, REST API, MODBUS
-- Amazon Echo/Alexis compatible
-- Simple web UI, or write your own script or program
-- AutoPing feature to reliably reboot routers or APs 
+- 4 12V relays
+- 2 PWM dew control
+- Current monitoring for the relays and PWM (one for all)
+- Input voltage monitoring 
 
 The DLI Digiswitch driver is compatible with libindi >= v1.8.2
 
 FEATURES
 ========
-- Control the power (on/off) for the 8 ports
-- Cycle the power of a port (if it's turned on)
+- Control the power (on/off) for the 4 ports
+- Control cycle % for 2 PWM dew ports
 - (Re)Name ports
 - Power everything on or off
-- Set the cycle delay time
 
 INSTALL
 =======
@@ -28,11 +26,11 @@ How to Use
 ==========
 
 You can use the driver in any INDI-compatible client (such as KStars or Xephem) - just select 
-DLI digiswitch from the Auxiliary list
+KOBSpower from the Auxiliary list
 
 To run the driver from the command line:
 
-$ indiserver indi_dli_digiswitch # plus other needed drivers (telescope, camera, etc)
+$ indiserver indi_KOBSpower # plus other needed drivers (telescope, camera, etc)
 
 or using the indiwebserver.
 
