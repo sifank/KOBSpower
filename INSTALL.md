@@ -2,7 +2,7 @@ Requirements
 ============
 
 As of this beta release, this has only been compiled on a Raspberry Pi 
-running Ubuntu Bionic (V18.04) and on a laptop running the same OS.
+running Ubuntu Jammy (V22.04.2) and on a laptop running the same OS.
 
 You need to install both indi and indi-dev to build this package. The best way
 is to install libindi-dev package from the PPA. If you cannot use
@@ -13,7 +13,7 @@ what other dependencies you find - I'll update the list)
 
 The driver is only compatible with firmware version 3.1.0 or higher.
 
-INDI DLI digiswitch driver is released as a in source and binary packages. It is compatible with libindi >= v1.8.2
+INDI KOBSpower driver is released in source and binary packages. It is compatible with libindi >= v1.8.2
 
 DEPENDENCIES:
 
@@ -26,8 +26,8 @@ Installation
 ============
 
 In a working directory of your choosing:
-1) $ git clone https://github.com/sifank/DLIdigiswitch.git
-2) $ cd DLIdigiswitch
+1) $ git clone https://github.com/sifank/KOBSpower.git
+2) $ cd KOBSpower
 3) $ mkdir build
 4) $ cd build
 5) $ cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Debug ../
