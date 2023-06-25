@@ -17,8 +17,6 @@
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-    TODO:
-
 */
 
 #include "KOBSpower.h"
@@ -52,14 +50,12 @@ bool KOBSpwr::Connect()
     // TODO add test for existence
     // TODO add ability to set and save default states
 
-    // ATTENTION need to find proper place for this
-    // setup port gpio array
-    setup();
+    setup();    // PI-gpio
     for (int i=1; i==POWER_N; i++) {
         setup_gpio(int(PortGpioNP[i].getValue()), OUTPUT, 0);  // all off initially
     }
 
-    DEBUG(INDI::Logger::DBG_SESSION, "KOBS power connected successfully.");
+    LOG_INFO("KOBS power connected successfully.");
     return true;
 
 }
@@ -70,7 +66,7 @@ bool KOBSpwr::Connect()
 bool KOBSpwr::Disconnect()
 {
     //cleanup();
-    DEBUG(INDI::Logger::DBG_SESSION, "KOBS power disconnected successfully.");
+    LOG_INFO("KOBS power disconnected successfully.");
     return true;
 }
 
@@ -92,45 +88,43 @@ bool KOBSpwr::initProperties()
     bool sStatus = false;
 
     if(!KOBSpwr::switchStatus(OUT1, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl1SP[DON].fill("P1ON", "On", sStatus ? ISS_ON : ISS_OFF);
     PortControl1SP[DOFF].fill("P1OFF", "Off", sStatus ? ISS_OFF : ISS_ON);
     PortControl1SP.fill(getDeviceName(), "PORT_1", PortLabelsTP[OUT1].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
 
     // Port 2
     if(!KOBSpwr::switchStatus(OUT2, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl2SP[DON].fill("P2ON", "On", sStatus ? ISS_ON : ISS_OFF);
     PortControl2SP[DOFF].fill("P2OFF", "Off", sStatus ? ISS_OFF : ISS_ON);
     PortControl2SP.fill(getDeviceName(), "PORT_2", PortLabelsTP[OUT2].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
 
     // Port 3
     if(!KOBSpwr::switchStatus(OUT3, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl3SP[DON].fill("P3ON", "On", sStatus ? ISS_ON : ISS_OFF);
     PortControl3SP[DOFF].fill("P3OFF", "Off", sStatus ? ISS_OFF : ISS_ON);
     PortControl3SP.fill(getDeviceName(), "PORT_3", PortLabelsTP[OUT3].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
 
     // Port 4
     if(!KOBSpwr::switchStatus(OUT4, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl4SP[DON].fill("P4ON", "On", sStatus ? ISS_ON : ISS_OFF);
     PortControl4SP[DOFF].fill("P4OFF", "Off", sStatus ? ISS_OFF : ISS_ON);
     PortControl4SP.fill(getDeviceName(), "PORT_4", PortLabelsTP[OUT4].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
 
     // Dew Cntl
-    // TODO retrieve current power setting and set below
-    DewCtl1NP[0].fill("Dew0", "Dew %", "%i", 0, 100, 10, 0);
+    DewCtl1NP[0].fill("Dew0", "Dew %", "%3.f", 0, 100, 10, 0);
     DewCtl1NP.fill(getDeviceName(), "DewCtl1", DewLabelsTP[DEW1].getText(), MAIN_CONTROL_TAB, IP_RW, 60, IPS_OK);
 
-    // TODO retrieve current power setting and set below
-    DewCtl2NP[0].fill("Dew1", "Dew %", "%i", 0, 100, 10, 0);
+    DewCtl2NP[0].fill("Dew1", "Dew %", "%3.f", 0, 100, 10, 0);
     DewCtl2NP.fill(getDeviceName(), "DewCtl2", DewLabelsTP[DEW2].getText(), MAIN_CONTROL_TAB, IP_RW, 60, IPS_OK);
 
     // Power (A) displays
-    PowerSensorsNP[IN_VOLTS].fill("INVOLTS", "Volts-in", "%.2f", 0, 100, 10, 0);
-    PowerSensorsNP[PORT_CURRENT].fill("PortP", "Port Current", "%.2f", 0, 100, 10, 0);
-    PowerSensorsNP[DEW_CURRENT].fill("DewP", "Dew Current", "%.2f", 0, 100, 10, 0);
+    PowerSensorsNP[IN_VOLTS].fill("INVOLTS", "Volts-in", "%5.2f", 0, 100, 10, 0);
+    PowerSensorsNP[PORT_CURRENT].fill("PortP", "Port Current", "%5.2f", 0, 100, 10, 0);
+    PowerSensorsNP[DEW_CURRENT].fill("DewP", "Dew Current", "%5.2f", 0, 100, 10, 0);
     PowerSensorsNP.fill(getDeviceName(), "POWERSTAT", "Power", MAIN_CONTROL_TAB, IP_RO, 60, IPS_OK);
 
     // All On/Off/Profile
@@ -156,20 +150,20 @@ bool KOBSpwr::initProperties()
     // Config tabs
     ////////////////
     // Port GPIO pins
-    PortGpioNP[OUT1].fill("PGPIO1", "Port A", "%i", 0, 26, 1, PortGpioNP[OUT1].getValue());
-    PortGpioNP[OUT2].fill("PGPIO2", "Port B", "%i", 0, 26, 1, 11);
-    PortGpioNP[OUT3].fill("PGPIO3", "Port C", "%i", 0, 26, 1, 25);
-    PortGpioNP[OUT4].fill("PGPIO4", "Port D", "%i", 0, 26, 1, 24);
+    PortGpioNP[OUT1].fill("PGPIO1", "Port A", "%2.f", 0, 26, 1, 8);
+    PortGpioNP[OUT2].fill("PGPIO2", "Port B", "%2.f", 0, 26, 1, 11);
+    PortGpioNP[OUT3].fill("PGPIO3", "Port C", "%2.f", 0, 26, 1, 25);
+    PortGpioNP[OUT4].fill("PGPIO4", "Port D", "%2.f", 0, 26, 1, 24);
     PortGpioNP.fill(getDeviceName(), "PGPIO", "Power GPIO Pins", CONFIG_TAB, IP_RW, 60, IPS_OK);
 
     // Dew GPIO pins
-    DewGpioNP[PIN].fill("DGPIN", "PIN", "%i", 0, 26, 1, 18);
-    DewGpioNP[MA1].fill("DGMA1", "MA 1", "%i", 0, 26, 1, 20);
-    DewGpioNP[MA2].fill("DGMA2", "MA 2", "%i", 0, 26, 1, 21);
-    DewGpioNP[MB1].fill("DGMB1", "MB 1", "%i", 0, 26, 1, 6);
-    DewGpioNP[MB2].fill("DGMB2", "MB 2", "%i", 0, 26, 1, 13);
-    DewGpioNP[PWMb].fill("DGPWMA", "PWM A", "%i", 0, 26, 1, 12);
-    DewGpioNP[PWMa].fill("DGPWMB", "PWM B", "%i", 0, 26, 1, 26);
+    DewGpioNP[PIN].fill("DGPIN", "PIN", "%2.f", 0, 26, 1, 18);
+    DewGpioNP[MA1].fill("DGMA1", "MA 1", "%2.f", 0, 26, 1, 20);
+    DewGpioNP[MA2].fill("DGMA2", "MA 2", "%2.f", 0, 26, 1, 21);
+    DewGpioNP[MB1].fill("DGMB1", "MB 1", "%2.f", 0, 26, 1, 6);
+    DewGpioNP[MB2].fill("DGMB2", "MB 2", "%2.f", 0, 26, 1, 13);
+    DewGpioNP[PWMb].fill("DGPWMA", "PWM A", "%2.f", 0, 26, 1, 12);
+    DewGpioNP[PWMa].fill("DGPWMB", "PWM B", "%2.f", 0, 26, 1, 26);
     DewGpioNP.fill(getDeviceName(), "DEWIO", "DEW GPIO Pins", CONFIG_TAB, IP_RW, 60, IPS_OK);
 
     // python power script location
@@ -189,15 +183,6 @@ bool KOBSpwr::updateProperties()
     INDI::DefaultDevice::updateProperties();
 
     if (isConnected()) {
-
-        // paint the device names
-        PortControl1SP.fill(getDeviceName(), "PORT_1", PortLabelsTP[OUT1].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
-        PortControl2SP.fill(getDeviceName(), "PORT_2", PortLabelsTP[OUT2].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
-        PortControl3SP.fill(getDeviceName(), "PORT_3", PortLabelsTP[OUT3].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
-        PortControl4SP.fill(getDeviceName(), "PORT_4", PortLabelsTP[OUT4].getText(), MAIN_CONTROL_TAB, IP_RW, ISR_ATMOST1, 60, IPS_OK);
-
-        DewCtl1NP.fill(getDeviceName(), "DewCtl1", DewLabelsTP[DEW1].getText(), MAIN_CONTROL_TAB, IP_RW, 60, IPS_OK);
-        DewCtl2NP.fill(getDeviceName(), "DewCtl2", DewLabelsTP[DEW2].getText(), MAIN_CONTROL_TAB, IP_RW, 60, IPS_OK);
 
         // We're connected, paint the tabs
         defineProperty(PortControl1SP);
@@ -251,11 +236,11 @@ bool KOBSpwr::ISNewSwitch (const char *dev, const char *name, ISState *states, c
             PortControl1SP.update(states, names, n);
             if (PortControl1SP[DON].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT1, DON))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 1 on");
+                    LOG_ERROR("Could not turn port 1 on");
             }
             else if (PortControl1SP[DOFF].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT1, DOFF))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 1 off");
+                    LOG_ERROR("Could not turn port 1 off");
             }
             PortControl1SP.setState(IPS_OK);
             PortControl1SP.apply();
@@ -268,11 +253,11 @@ bool KOBSpwr::ISNewSwitch (const char *dev, const char *name, ISState *states, c
             PortControl2SP.update(states, names, n);
             if (PortControl2SP[DON].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT2, DON))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 2 on");
+                    LOG_ERROR("Could not turn port 2 on");
             }
             else if (PortControl2SP[DOFF].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT2, DOFF))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 2 off");
+                    LOG_ERROR("Could not turn port 2 off");
             }
             PortControl2SP.setState(IPS_OK);
             PortControl2SP.apply();
@@ -285,11 +270,11 @@ bool KOBSpwr::ISNewSwitch (const char *dev, const char *name, ISState *states, c
             PortControl3SP.update(states, names, n);
             if (PortControl3SP[DON].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT3, DON))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 3 on");
+                    LOG_ERROR("Could not turn port 3 on");
             }
             else if (PortControl3SP[DOFF].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT3, DOFF))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 3 off");
+                    LOG_ERROR("Could not turn port 3 off");
             }
             PortControl3SP.setState(IPS_OK);
             PortControl3SP.apply();
@@ -302,11 +287,11 @@ bool KOBSpwr::ISNewSwitch (const char *dev, const char *name, ISState *states, c
             PortControl4SP.update(states, names, n);
             if (PortControl4SP[DON].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT4, DON))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 4 on");
+                    LOG_ERROR("Could not turn port 4 on");
             }
             else if (PortControl4SP[DOFF].getState() == ISS_ON) {
                 if (!KOBSpwr::switchControl(OUT4, DOFF))
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 4 off");
+                    LOG_ERROR("Could not turn port 4 off");
             }
             PortControl4SP.setState(IPS_OK);
             PortControl4SP.apply();
@@ -329,22 +314,22 @@ bool KOBSpwr::ISNewSwitch (const char *dev, const char *name, ISState *states, c
                 if (KOBSpwr::switchControl(OUT1, DON))
                     PortControl1SP[DON].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 1 on");
+                    LOG_ERROR("Could not turn port 1 on");
 
                 if (KOBSpwr::switchControl(OUT2, DON))
                     PortControl2SP[DON].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 2 on");
+                    LOG_ERROR("Could not turn port 2 on");
 
                 if (KOBSpwr::switchControl(OUT3, DON))
                     PortControl3SP[DON].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 3 on");
+                    LOG_ERROR("Could not turn port 3 on");
 
                 if (KOBSpwr::switchControl(OUT4, DON))
                     PortControl4SP[DON].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 4 on");
+                    LOG_ERROR("Could not turn port 4 on");
 
                 AllSP[DON].setState(ISS_ON);
                 AllSP[DOFF].setState(ISS_OFF);
@@ -357,23 +342,30 @@ bool KOBSpwr::ISNewSwitch (const char *dev, const char *name, ISState *states, c
                 if (KOBSpwr::switchControl(OUT1, DOFF))
                     PortControl1SP[DOFF].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 1 off");
+                    LOG_ERROR("Could not turn port 1 off");
 
                 if (KOBSpwr::switchControl(OUT2, DOFF))
                     PortControl2SP[DOFF].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 2 off");
+                    LOG_ERROR("Could not turn port 2 off");
 
                 if (KOBSpwr::switchControl(OUT3, DOFF))
                     PortControl3SP[DOFF].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 3 off");
+                    LOG_ERROR("Could not turn port 3 off");
 
                 if (KOBSpwr::switchControl(OUT4, DOFF))
                     PortControl4SP[DOFF].setState(ISS_ON);
                 else
-                    DEBUG(INDI::Logger::DBG_ERROR, "Could not turn port 4 off");
-                
+                    LOG_ERROR("Could not turn port 4 off");
+
+                KOBSpwr::setPWM(PWMa, 0);
+                DewCtl1NP[0].setValue(0);
+                DewCtl1NP.apply();
+                KOBSpwr::setPWM(PWMb, 0);
+                DewCtl2NP[0].setValue(0);
+                DewCtl2NP.apply();
+
                 AllSP[DOFF].setState(ISS_ON);
                 AllSP[DON].setState(ISS_OFF);
                 AllSP.setState(IPS_OK);
@@ -396,9 +388,8 @@ bool KOBSpwr::ISNewText (const char *dev, const char *name, char *texts[], char 
         if (PortLabelsTP.isNameMatch(name))
         {
             PortLabelsTP.update(texts, names, n);
-
-            //DEBUG(INDI::Logger::DBG_WARNING, "You will need to Options/Save then Disconnect/Connect for name(s) to appear on the Main Tab");
-
+            // TODO: this warning comes out at startup as well - need to find way to display 'only' when changed
+            //LOG_WARN("You will need to Options/Save then Disconnect/Connect for name(s) to appear on the Main Tab");
             PortLabelsTP.setState(IPS_OK);
             PortLabelsTP.apply();
         }
@@ -407,9 +398,7 @@ bool KOBSpwr::ISNewText (const char *dev, const char *name, char *texts[], char 
         if (DewLabelsTP.isNameMatch(name))
         {
             DewLabelsTP.update(texts, names, n);
-
-            //DEBUG(INDI::Logger::DBG_WARNING, "You will need to Options/Save then Disconnect/Connect for name(s) to appear on the Main Tab");
-
+            //LOG_WARN("You will need to Options/Save then Disconnect/Connect for name(s) to appear on the Main Tab");
             DewLabelsTP.setState(IPS_OK);
             DewLabelsTP.apply();
         }
@@ -418,9 +407,7 @@ bool KOBSpwr::ISNewText (const char *dev, const char *name, char *texts[], char 
         if (ScriptsTP.isNameMatch(name))
         {
             ScriptsTP.update(texts, names, n);
-
-            //DEBUG(INDI::Logger::DBG_WARNING, "You will need to Options/Save then Disconnect/Connect for name(s) to appear on the Main Tab");
-
+            //LOG_WARN("You will need to Options/Save then Disconnect/Connect for name(s) to appear on the Main Tab");
             ScriptsTP.setState(IPS_OK);
             ScriptsTP.apply();
         }
@@ -433,47 +420,26 @@ bool KOBSpwr::ISNewText (const char *dev, const char *name, char *texts[], char 
 //////////////////////////////////////////////////////////////////////////////
 bool KOBSpwr::ISNewNumber(const char *dev, const char *name, double values[], char *names[], int n)
 {
-    // TODO add dew
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
     {
         if(PortGpioNP.isNameMatch(name)) {
             PortGpioNP.update(values, names, n);
-            //for (int i; i==POWER_N; i++) {
-                //PortGpioNP[i].setValue(int(PortGpioNP[i].getValue()));
-                //PortGpioNP[i].value = int(PortGpioNP[i].getValue());
-                //LOGF_INFO("Out%i: %i", i, int(PortGpioNP[i].getValue()));
-            //}
-            //PortGpioNP[OUT1].getValue();
-            //PortGpioNP[OUT2].getValue();
-            //PortGpioNP[OUT3].getValue();
-            //PortGpioNP[OUT4].getValue();
-            //IDSetNumber(&PortGpioNP, nullptr);
-            //PortGpioNP.setState(IPS_OK);
             PortGpioNP.apply();
         }
 
         if(DewGpioNP.isNameMatch(name)) {
             DewGpioNP.update(values, names, n);
-            //for (int i; i==DGPIO_N; i++) {
-                //DewGpioNP[i].setValue(int(DewGpioNP[i].getValue()));
-                //DewGpioNP[i].value = int(DewGpioNP[i].getValue());
-            //}
             DewGpioNP.apply();
         }
 
         if(DewCtl1NP.isNameMatch(name)) {
             DewCtl1NP.update(values, names, n);
-            //int dew1per = int(DewCtl1NP[0].getValue());
-            //DewCtl1NP[0].value = dew1per;
-            //DewCtl1NP[0].setValue(dew1per);
-
             KOBSpwr::setPWM(PWMb, int(DewCtl1NP[0].getValue()));
             DewCtl1NP.apply();
         }
 
         if(DewCtl2NP.isNameMatch(name)) {
             DewCtl2NP.update(values, names, n);
-            //DewCtl2NP[0].value = DewCtl2NP[0].getValue();
             KOBSpwr::setPWM(PWMa, int(DewCtl2NP[0].getValue()));
             DewCtl2NP.apply();
         }
@@ -493,30 +459,28 @@ void KOBSpwr::TimerHit()
     // update switch status
     bool sStatus = false;
     if(!KOBSpwr::switchStatus(OUT1, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl1SP[DON].setState(sStatus ? ISS_ON : ISS_OFF);
     PortControl1SP[DOFF].setState(sStatus ? ISS_OFF : ISS_ON);
     PortControl1SP.apply();
 
     if(!KOBSpwr::switchStatus(OUT2, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl2SP[DON].setState(sStatus ? ISS_ON : ISS_OFF);
     PortControl2SP[DOFF].setState(sStatus ? ISS_OFF : ISS_ON);
     PortControl2SP.apply();
 
     if(!KOBSpwr::switchStatus(OUT3, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl3SP[DON].setState(sStatus ? ISS_ON : ISS_OFF);
     PortControl3SP[DOFF].setState(sStatus ? ISS_OFF : ISS_ON);
     PortControl3SP.apply();
 
     if(!KOBSpwr::switchStatus(OUT4, sStatus))
-        DEBUG(INDI::Logger::DBG_ERROR, "Problem getting status");
+        LOG_ERROR("Problem getting status");
     PortControl4SP[DON].setState(sStatus ? ISS_ON : ISS_OFF);
     PortControl4SP[DOFF].setState(sStatus ? ISS_OFF : ISS_ON);
     PortControl4SP.apply();
-
-    // TODO add dew
 
     // update the current values
     getPwr();
@@ -536,9 +500,6 @@ void KOBSpwr::TimerHit()
 void KOBSpwr::ISGetProperties(const char *dev)
 {
     INDI::DefaultDevice::ISGetProperties(dev);
-    // TODO do we really have to defineProperty here?
-    defineProperty(PortLabelsTP);
-    defineProperty(DewLabelsTP);
 
     loadConfig(true, PortLabelsTP.getName());
     loadConfig(true, DewLabelsTP.getName());
@@ -562,8 +523,6 @@ bool KOBSpwr::saveConfigItems(FILE *fp)
 
 //////////////////// Communicatiion Functions /////////////////////////////
 
-///////////////////////// READ Functions //////////////////////
-
 ///////////////////////////////////////////////////////////////
 // get switch status
 ///////////////////////////////////////////////////////////////
@@ -571,7 +530,6 @@ bool KOBSpwr::switchStatus(int rport, bool &sStatus)
 {
     // TODO add test for connection
     int port = int(PortGpioNP[rport].getValue());
-    //LOGF_INFO("Requested port: %i GPIO pins: %i", rport, port);
 
     setup();
     if (input_gpio(port)) {
@@ -584,7 +542,6 @@ bool KOBSpwr::switchStatus(int rport, bool &sStatus)
     }
 }
 
-///////////////////////// WRITE functions /////////////////////
 ///////////////////////////////////////////////////////////////
 //   control switch (on/off)
 ///////////////////////////////////////////////////////////////

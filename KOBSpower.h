@@ -18,19 +18,12 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 */
-#include <defaultdevice.h>  // ALERT not in new format
-#include <curl/curl.h>
-#include <memory>
+#include <defaultdevice.h>
 #include <indipropertytext.h>
 #include <indipropertyswitch.h>
 #include <indipropertynumber.h>
 #include <pi-gpio.h>
-#include "config.h"     // ATTENTION needed?
-#include <cstring>
-#include <unistd.h>
-#include <string>
-#include <iostream>
-#include <stdio.h>
+#include "config.h"
 
 using namespace std;
 
