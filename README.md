@@ -65,10 +65,28 @@ Before you Start
 OPERATIONS
 ==========
 
-Options Tab (Unauthenticated)
+Config Tab
+----------
+
+![Options Tab](Assets/ConfigTab.png)
+
+
+Main Tab
+--------
+
+![Main Tab](Assets/MainTab.png)
+
+The Main Tab allows you to connect/disconnect from the Digiswitch as well as turn the ports on or off, or cycle the port if it is on.
+
+The cycle time will be whatever is set in the Digiswitch.
+
+This also allows you to turn all port on or off.
+
+
+Options Tab
 -----------
 
-![Options Tab](Assets/OptionsTab-initial.jpeg)
+![Options Tab](Assets/OptionsTab.png)
 
 First time access, you will need to set the user name, password and hostname of the DLI digiswitch.  
 
@@ -77,35 +95,10 @@ NOTE: you will need to click on the 'Connect' button on the Main Tab to continue
 Once authenticaled, the authentication fields will disappear and the port names fields will appear.
 
 
-Options Tab (Authenticated)
------------
-
-![Options Tab](Assets/OptionsTab-authenticated.jpeg)
-
-After authenticating and connecting, the Options Tab will allow you to name/rename the ports.  This will rename them in the Digiswitch as well.
-
-When the driver is started, it will retrieve these names from the Digiswitch.
-
-If you fail to login after a number of times (3?), a 'wrong password lockout' will occur (5 mins default).  The time can be changed in the Digiswitch (see optional setup above).
-
-Cycle Delay: this allows you to modify the Digiswitch's delay time for cycling a port
-
-
-Main Tab
---------
-
-![Main Tab](Assets/MainTab.jpeg)
-
-The Main Tab allows you to connect/disconnect from the Digiswitch as well as turn the ports on or off, or cycle the port if it is on.
-
-The cycle time will be whatever is set in the Digiswitch.
-
-This also allows you to turn all port on or off.
-
 General Info Tab
 ----------------
 
-![General Info Tab](Assets/GeneralInfoTab.jpeg)
+![General Info Tab](Assets/GeneralTab.png)
 
 Driver Info/Version is the version of this INDI driver
 
